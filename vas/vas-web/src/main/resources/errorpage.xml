@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<errorpage xmlns="http://platform.dtds.com/schema/platform"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://platform.dtds.com/schema/platform http://platform.dtds.com/schema/platform-0.1.xsd">
+
+	<error url="/" page="/error" />
+
+</errorpage>
+	

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+	
+	<import resource="applicationContext-redis.xml" />
+	<!-- 开启注解方式依赖注入 -->
+	<context:annotation-config />
+	<context:component-scan base-package="com.tsh.dubbo.vas" />
+
+	<!-- 日期格式 -->
+	<bean id="dateFormat" class="java.text.SimpleDateFormat">
+		<constructor-arg value="yyyy-MM-dd" />
+	</bean>
+
+	<bean id="tshDiamondClient" class="com.tsh.dubbo.diamond.TshDiamondClient" init-method="init"></bean>
+
+	<bean id="mysqlDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${var.jdbc.driver}" />
+		<property name="url" value="${vas.mysql.url}" />
+		<property name="username" value="${vas.mysql.username}" />
+		<property name="password" value="${vas.mysql.password}" />		
+        <property name="maxActive" value="${dbcp.maxActive}"></property>
+		<property name="minIdle" value="${dbcp.minIdle}"></property>
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="${dbcp.maxWait}"></property>
+		<property name="initialSize" value="5"></property>
+		<property name="defaultAutoCommit" value="true"></property>	
+		<property name="testWhileIdle" value="true"></property>
+		<property name="testOnBorrow" value="false"></property>
+		<property name="testOnReturn" value="true"></property>
+		<property name="validationQuery" value="SELECT 1"></property>
+		<property name="validationQueryTimeout" value="1"></property>
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}" />
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMillis}" />
+		<!-- 解密密码必须要配置的项 -->
+		<property name="filters" value="config" />
+		<property name="connectionProperties" value="config.decrypt=false" />
+	</bean>
+
+	<!-- Hiberante配置 -->
+	<bean id="sessionFactory" lazy-init="false"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="mysqlDataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+      			<prop key="hibernate.format_sql">false</prop>
+			</props>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>com.tsh.dubbo.vas.po</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<aop:aspectj-autoproxy expose-proxy="true" />
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" propagation="REQUIRED" read-only="false" rollback-for="Exception" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:advisor pointcut="execution(* com.tsh.dubbo.vas.api.impl..*.*(..))" advice-ref="txAdvice" />
+	</aop:config>
+
+	<!-- 配置应用中获取spring环境工具类 -->
+	<bean id="applicationContext" class="com.dtds.platform.util.spring.SpringContextUtil" />
+</beans>

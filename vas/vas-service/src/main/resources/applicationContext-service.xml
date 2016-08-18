@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:platform="http://platform.dtds.com/schema/platform"
+xmlns:task="http://www.springframework.org/schema/task"
+xmlns:aop="http://www.springframework.org/schema/aop"
+xmlns:tx="http://www.springframework.org/schema/tx"
+xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://platform.dtds.com/schema/platform classpath:/platform/schema/platform-0.1.xsd 
+	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+	http://code.alibabatech.com/schema/dubbo
+    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+	<bean class="com.dtds.platform.util.spring.SpringContextUtil"></bean>
+	
+	<bean id="tshDiamondClient" class="com.tsh.diamond.TshDiamondClient" init-method="init"></bean> 
+	
+	<platform:component-scan base-package="com.tsh"/>
+	
+	
+
+	<task:annotation-driven />
+	<import resource="applicationContext-dao.xml" />
+	
+ 	 <import resource="lts-quartz.xml" />
+
+	<import resource="applicationContext-metaq.xml" />
+	<import resource="applicationContext-redis.xml" />
+	
+	<!-- 对com.tsh.demo.service下的所有方法增加事务 -->
+	<aop:aspectj-autoproxy expose-proxy="true" />
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" propagation="REQUIRED" read-only="false" rollback-for="Exception"/> 
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+	<aop:advisor pointcut="execution(* com.tsh.vas.service..*.*(..))" advice-ref="txAdvice" />
+	</aop:config>
+	
+	<bean class="com.tsh.platform.aop.TshLogAspect"></bean>
+	
+	<dubbo:application name="dubbo-consumer-vas" />
+	<!-- retries 调用dubbo服务不成功，即报错，不重复调用 -->
+	<dubbo:provider delay="-1" timeout="${timeout}" retries="0" /> 
+	
+	<!-- check="false" 不检查api是否注册成功 -->
+	<dubbo:registry address="${zookeeper}" check="false" timeout="${timeout}" />
+	<!-- 网点 -->
+	<dubbo:reference id="areaApi" interface="com.tsh.dubbo.bis.api.AreaApi" check="false" timeout="60000" />
+	<!-- 县域 -->
+	<dubbo:reference id="shopApi" interface="com.tsh.dubbo.bis.api.ShopApi" check="false" timeout="60000" />
+	
+	<dubbo:reference id="companyApi" interface="com.tsh.dubbo.bis.api.CompanyApi" check="false" timeout="60000" />
+	<!-- 供应商 -->
+	<dubbo:reference id="supplierApi" interface="com.tsh.dubbo.bis.api.SupplierApi" check="false" timeout="60000" />
+	
+	<!-- 商品接口 -->
+	<dubbo:reference id="virtualGoodsApi" interface="com.tsh.dubbo.gms.api.VirtualGoodsApi" check="false" timeout="60000" />
+	
+	<!-- 区域id -->
+	<dubbo:reference id="addressApi" interface="com.tsh.dubbo.share.api.AddressApi" check="false" timeout="60000" />
+	
+</beans>

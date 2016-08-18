@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.tsh.tomcat</groupId>
+	<artifactId>vas</artifactId>
+	<version>3.0.0</version>
+	<packaging>pom</packaging>
+
+
+
+	<modules>
+		<module>vas-po</module>
+		<module>vas-vo</module>
+		<module>vas-dao</module>
+		<module>vas-service</module>
+		<module>vas-util</module>
+		<module>vas-web</module>
+	</modules>
+
+	<properties>
+		<platform.version>3.0.0-SNAPSHOT</platform.version>
+		<java.version>1.7</java.version>
+	</properties>
+	<parent>
+		<groupId>com.dtds.depend</groupId>
+		<artifactId>depend-webapp</artifactId>
+		<version>3.0-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.tsh.dubbo</groupId>
+			<artifactId>dubbo-bis-api</artifactId>
+			<version>3.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tsh.dubbo</groupId>
+			<artifactId>dubbo-gms-api</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tsh.dubbo</groupId>
+			<artifactId>dubbo-share-api</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+</project>

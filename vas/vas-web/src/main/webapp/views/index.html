@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title>话费充值</title>
+	<script type="text/javascript" src="../static/tsh/1.0.0/jquery.min.js"></script>
+	<style type="text/css">
+     *{padding: 0px;margin: 0px;}
+     body,html{background: #F5F5F5;}
+     .w_head{width: 100%;height: 150px;border-bottom: 1px solid #DEDEDE;}
+     .w_head>img{width:100%;height:100%;}
+     .w_content{width:100%;height:280px;background:#FFF;}
+     .wrap{width:100%;height:110px;line-height:100px;}
+     .title{font-size: 1.1rem;color:#363636;padding-left: 18px;float:left;}
+     input[type=phone]{width:55%;height:32px;border-radius: 20px;outline:none;border:1px solid #DEDEDE;padding: 3px 20px}
+     .tip{float: left;width:auto;height:30px;display: inline;line-height: 30px;margin-top: -20px;font-size: 0.9rem;color:#AED780;margin-left: 105px;}
+     .box-ul{list-style: none;float:left;min-height: 50px;margin-top: 30px;}
+     .box-item{float:left;width:80px;height:40px;background:#fff;margin-right: 8px;line-height: 40px;text-align: center;font-size: 1.2rem;color:#333;border-radius: 5px;border:1px solid #DEDEDE;}
+     .box-item-selected{border:1px solid #F00;background:url(../static/tsh/img/angle.png) no-repeat 56px 17px;}
+     button{width:100px;height:40px;text-align:center;line-height:40px;border-radius:30px;border:1px solid #FF4400;background:#FF4400;font-size:1.0rem;color:#FFF;margin-left:100px;}
+     .line{display:inline-block;width:100%;height:15px;background:url(../static/tsh/img/line.png) repeat-x;}
+	</style>
+	<script type="text/javascript">
+	var mobile = /^1[3|4|5|7|8]\d{9}$/;
+    $(function(){
+       var moneyData=[
+          {"id":"m1","txt":"50元","money":"50"},
+          {"id":"m2","txt":"100元","money":"100"},
+          {"id":"m3","txt":"150元","money":"150"}
+       ];
+	   initChargeBox(moneyData);
+       function initChargeBox(data){
+       	  var liHtml="";
+          for(var i=0;i<data.length;i++){
+            liHtml+='<li class="box-item" id="'+data[i].id+'" money="'+data[i].money+'">'+data[i].txt+'</li>';
+          }
+          $('.box-ul').html(liHtml);
+          $(document).on("click",".box-item",function(){
+          	 $(this).addClass('box-item-selected').siblings().removeClass('box-item-selected');
+          });
+       }
+       $("#submit").click(function(){
+       	  var phone=$("#phone").val();
+       	  var money=$('.box-item-selected').attr("money");
+       		if(!(mobile.test(phone)))
+       		{ 
+       			alert("手机号码有误，请重填!");
+       			$("#phone").val("");
+       			$("#phone").focus();
+       			return false;
+       		}else{
+       			if(undefined == money){
+       				alert("请选择充值金额!");
+       			}else{
+       				alert(phone+";"+money);	
+       			}
+       		}
+       });
+    });
+	</script>
+</head>
+<body>
+	<section class="w_head">
+		<img src="../static/tsh/img/headImg.png">
+	</section>
+	<section class="w_content">
+		<div class="wrap">
+			<span class="title">手机号码：</span><input type="phone" id="phone" placeholder="支持移动、联通、电信" />
+			<p class="tip">请仔细核对充值号码，充错号将无法退款</p>
+		</div>
+
+        <div class="wrap">
+			<span class="title">充值金额：</span>
+			<ul class="box-ul">							
+			</ul>
+		</div>
+        <button id="submit">立即充值</button>
+	</section>
+	<label class="line"></label>
+</body>
+</html>

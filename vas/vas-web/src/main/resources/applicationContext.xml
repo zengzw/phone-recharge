@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:platform="http://platform.dtds.com/schema/platform"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/mvc 
+	http://www.springframework.org/schema/mvc/spring-mvc.xsd
+	http://www.springframework.org/schema/task  
+    http://www.springframework.org/schema/task/spring-task.xsd
+	http://platform.dtds.com/schema/platform classpath:/platform/schema/platform-0.1.xsd">
+	<import resource="applicationContext-service.xml" />
+	
+	<platform:component-scan base-package="com.tsh.vas.controller" />
+	
+	<platform:config xss="disable" sessionExpiry="3600" distributedSession="disable" />
+		<!-- 初始化数据 -->
+	<bean class="com.tsh.vas.controller.init.RechargeProductInitialize"></bean>
+	
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean id="mappingJacksonHttpMessageConverter"
+					class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+	
+	<mvc:resources location="/static/" mapping="/static/**"></mvc:resources>
+	<mvc:resources location="/dtds-commons/" mapping="/dtds-commons/**"></mvc:resources>
+	<mvc:resources location="/views/" mapping="/views/**"></mvc:resources>
+</beans>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+       >
+
+	<!-- 消息工厂 -->
+    <bean id="messageSessionFactory" class="com.taobao.metamorphosis.client.extension.spring.MetaqMessageSessionFactoryBean">
+		<property name="zkConnect" value="${zkConnect}" />
+		<property name="zkSessionTimeoutMs" value="${zkSessionTimeoutMs}" />
+		<property name="zkConnectionTimeoutMs" value="${zkConnectionTimeoutMs}" />
+		<property name="zkSyncTimeMs" value="${zkSyncTimeMs}" />
+	</bean>
+    
+	<!-- 消息体转换器 -->
+	<bean id="messageBodyConverter" class="com.taobao.metamorphosis.client.extension.spring.JavaSerializationMessageBodyConverter" />
+
+	<!-- 消息发送模板 -->
+	<bean id="metaqTemplate"
+		class="com.taobao.metamorphosis.client.extension.spring.MetaqTemplate">
+		<property name="messageSessionFactory" ref="messageSessionFactory" />
+		<property name="messageBodyConverter" ref="messageBodyConverter" />
+	</bean>
+	
+	<!-- 实例化com.dtds.platform.data.metaq.Producer类，用此类中函数推送消息到metaq -->
+	<bean id="example" class="com.dtds.platform.data.metaq.Producer">
+		<property name="messageSessionFactory" ref="messageSessionFactory" />
+	</bean>
+	
+	<!-- =============metaq send============= -->
+	
+	<!-- 测试用主题 test -->
+	<!-- <bean id="testTopic"
+		class="com.taobao.metamorphosis.client.extension.spring.MetaqTopic">
+		<property name="group" value="testGroup34" />	消息所属组，如果有多个地方发送同一个主题的消息，则组名称必须不一样，组名对业务没有任何参考意义
+		<property name="topic" value="reportOrder" />	消息主题
+		<property name="maxBufferSize" value="${maxBufferSize}" />
+	</bean> -->
+	
+	<!-- 框架日志主题 -->
+	<bean id="ordVirRechargeTopic" class="com.taobao.metamorphosis.client.extension.spring.MetaqTopic">
+		<property name="group" value="ord_vir_recharge_group" /><!-- 消息所属组，如果有多个地方发送同一个主题的消息，则组名称必须不一样，组名对业务没有任何参考意义 -->
+		<property name="topic" value="ord_vir_recharge_topic" />	<!-- 消息主题 -->
+		<property name="maxBufferSize" value="${maxBufferSize}" />
+	</bean>
+
+	<!-- ==============metaq Listener==================== -->
+	<!-- 消费端监听实现 -->
+	<bean id="vasBillMessageListener" class="com.tsh.listener.VasBillMessageListener">
+		<property name="processThreads" value="10" />
+	</bean>
+	
+	<!-- 消费端监听容器 -->
+	<bean id="listenerContainer"
+		class="com.taobao.metamorphosis.client.extension.spring.MessageListenerContainer">
+		<property name="messageSessionFactory" ref="messageSessionFactory" />
+		<property name="messageBodyConverter" ref="messageBodyConverter" />
+		<property name="subscribers">
+			<map>
+				<!-- 话费充值订单 -->
+				<entry key-ref="ordVirRechargeTopic" value-ref="vasBillMessageListener" />
+			</map>
+		</property>
+	</bean>
+	
+</beans>

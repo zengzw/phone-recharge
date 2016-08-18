@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+     
+  	<!-- 产品更新  -->
+  	<bean name="refreshPhoneProduct" class="com.tsh.recharge.gaoypay.phone.timer.RechargeProductTimer" />
+  	
+    <bean id="quartzJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="refreshPhoneProduct"/>
+        <property name="targetMethod" value="start"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+    <bean id="quartzTestTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="quartzJob"/>
+       <property name="cronExpression" value="0 0 0 * * ?"/> 
+        <property name="description" value="vas_phoneproduct_quartz_task"/>
+    </bean>
+	<!-- <bean name="quartzCallbackScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="quartzTestTrigger"/>
+            </list>
+        </property>
+    </bean> -->
+	
+ 	<!--    callback 定时任务 -->
+    <bean name="rechargeCallbackTimer" class="com.tsh.recharge.timer.RechargeCallBackTimer" />
+    
+    <bean id="quartzCallbackJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="rechargeCallbackTimer"/>
+        <property name="targetMethod" value="start"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+    <bean id="quartzCallbackTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="quartzCallbackJob"/>
+       <property name="cronExpression" value="0 */4 * * * ?"/> 
+        <property name="description" value="vas_callback_quartz_task"/>
+    </bean>
+    <!-- <bean name="quartzCallbackScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="quartzCallbackTrigger"/>
+            </list>
+        </property>
+    </bean> -->
+    
+   <!--  针对内部失败位充值的订单，轮休去补单  定时任务 -->
+     <bean name="rechargeErrorTimer" class="com.tsh.recharge.timer.RechargeErrorTimer" />
+    <bean id="quartzrechargeErrorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="rechargeErrorTimer"/>
+        <property name="targetMethod" value="start"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+    <bean id="quartzRechargeErrorTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="quartzrechargeErrorJob"/>
+       <property name="cronExpression" value="0 */2 * * * ?"/> 
+        <property name="description" value="vas_rechargeError_quartz_task"/>
+    </bean>
+    <!-- <bean name="quartzRechargeErrorScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="quartzRechargeErrorTrigger"/>
+            </list>
+        </property>
+    </bean> -->
+    
+    
+    <!-- 成功率统计 定时任务 -->
+    <bean name="depositStatisTimer" class="com.tsh.recharge.timer.DepositStatisTimer" />
+    <bean id="quartzDepositStatisJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="depositStatisTimer"/>
+        <property name="targetMethod" value="start"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+    <bean id="quartzDepositStatisTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="quartzDepositStatisJob"/>
+       <property name="cronExpression" value="0 */30 * * * ?"/> 
+        <property name="description" value="vas_depositStatis_quartz_task"/>
+    </bean>
+    <!-- <bean name="quartzDepositStatisScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="quartzDepositStatisTrigger"/>
+            </list>
+        </property>
+    </bean> -->
+    
+    
+    <!--推送订单通知 定时任务 -->
+    <bean name="pushOrderStatusTimer" class="com.tsh.recharge.timer.PushOrderStatusTimer" />
+    <bean id="quartzPushOrderStatusJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="pushOrderStatusTimer"/>
+        <property name="targetMethod" value="start"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+    <bean id="quartzPushOrderStatusTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="quartzPushOrderStatusJob"/>
+       <property name="cronExpression" value="0 */1 * * * ?"/> 
+        <property name="description" value="vas_pushOrderStatus_quartz_task"/>
+    </bean>
+    <!-- <bean name="quartzPushOrderStatusScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="quartzPushOrderStatusTrigger"/>
+            </list>
+        </property>
+    </bean> -->
+    
+    <!-- 定期处理日志 -->
+    <bean name="clearLogTimer" class="com.tsh.recharge.timer.ClearLogTimer" />
+    <bean id="clearLogTimerJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="clearLogTimer"/>
+        <property name="targetMethod" value="start"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+    <bean id="clearLogTimerTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="clearLogTimerJob"/>
+       <property name="cronExpression" value="2 * * * * ?"/> 
+        <property name="description" value="clearLog_quartz_task"/>
+    </bean>
+    
+    <bean name="VasTimerScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="clearLogTimerTrigger"/>
+                <ref bean="quartzPushOrderStatusTrigger"/>
+                <ref bean="quartzDepositStatisTrigger"/>
+                <ref bean="quartzRechargeErrorTrigger"/>
+                <ref bean="quartzCallbackTrigger" />
+                <ref bean="quartzTestTrigger" />
+            </list>
+        </property>
+    </bean>	 
+    
+    
+<bean class="com.github.ltsopensource.spring.quartz.QuartzLTSProxyBean">
+        <property name="clusterName" value="${clusterName}"/>
+        <property name="registryAddress" value="${registryAddress}"/>
+        <property name="nodeGroup" value="vas_quartz_trade_TaskTracker"/>
+        <property name="configs">
+            <props>
+                <prop key="job.fail.store">mapdb</prop>
+            </props>
+        </property>
+    </bean> 
+ 
+</beans>

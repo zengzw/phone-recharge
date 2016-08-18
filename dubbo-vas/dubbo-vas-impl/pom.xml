@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.tsh.tomcat</groupId>
+		<artifactId>dubbo-vas</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>dubbo-vas-impl</artifactId>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.tsh.tomcat</groupId>
+			<artifactId>dubbo-vas-api</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+		  <groupId>com.dtds.platform</groupId>
+		  <artifactId>platform-util</artifactId>
+		  <version>${platform.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dtds.platform</groupId>
+			<artifactId>platform-data</artifactId>
+			<version>${platform.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dtds.platform</groupId>
+			<artifactId>platform-aop</artifactId>
+			<version>${platform.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+		<!-- dubbo -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>dubbo</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>com.101tec</groupId>
+		    <artifactId>zkclient</artifactId>
+		</dependency>
+		<!-- diamond -->
+		<dependency>
+			<groupId>com.zhc</groupId>
+			<artifactId>diamond-utils</artifactId>
+			<version>2.0.5.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.zhc</groupId>
+			<artifactId>diamond-client</artifactId>
+			<version>2.0.5.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.caucho</groupId>
+			<artifactId>hessian</artifactId>
+			<version>3.1.5</version>
+		</dependency>
+	</dependencies>
+	<build>
+	<finalName>${project.artifactId}</finalName> 
+	<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions> 
+			</plugin>		
+		</plugins>
+	</build>
+	
+</project>
